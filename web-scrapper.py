@@ -16,6 +16,7 @@ import re
 import requests
 import os
 
+#scrape and fetches all the relevant html links from arxiv 
 def web_scrape_author():
     urls = [
         'https://arxiv.org/list/econ.GN/recent',
@@ -48,6 +49,7 @@ def web_scrape_author():
         for link in all_links:
             writer.writerow([link])
 
+#scrapes all the relevant information from a particular link
 def web_scrape_links(url):
     driver = webdriver.Chrome()
     driver.get(url)
@@ -82,6 +84,7 @@ def web_scrape_links(url):
 
     driver.quit()
 
+#used to give the topic for particular row number in the csv
 def add_topic(row, topic):
     df = pd.read_csv('medium_content.csv')
     if 'newcol' not in df.columns:
@@ -89,6 +92,7 @@ def add_topic(row, topic):
     df.at[row, 'newcol'] = topic
     df.to_csv('medium_content.csv', index=False)
 
+#cleans the content fetched from the website
 def clean_text(text):
     from nltk import pos_tag
     text = text.lower()
@@ -110,12 +114,16 @@ def clean_text(text):
     text = re.sub(r"improve html version papers, feedback help enhance accessibility mobile support report error html help u improve conversion rendering, choose method listed team already identified following issue appreciate time reviewing reporting rendering error may found yet effort help u improve html version readers, disability barrier accessing research thank continued support championing open access free development cycle help support accessibility arxiv collaborator latexml maintain list package need conversion, welcome developer contribution", "", text, flags=re.IGNORECASE)
     return text
 
+#deletes a particular row
+#used while testing
 def delete_row_by_number(row_number):
     df = pd.read_csv('medium_content.csv')
     df = df.drop(index=row_number)
     df.to_csv('medium_content.csv', index=False)
 
 
+#cleans only a particular row
+#used fofr testing
 def clean_csv_row(row_index):
     
     filename = 'medium_content.csv'
@@ -126,6 +134,7 @@ def clean_csv_row(row_index):
     df.to_csv(filename, index=False)
     print("cleaned")
 
+#scrapes all the data from all the links in the csv file
 def scrape_all_links_from_csv(csv_filename):
     with open(csv_filename, mode='r') as file:
         reader = csv.reader(file)
@@ -138,12 +147,13 @@ def scrape_all_links_from_csv(csv_filename):
     for url in urls:
         web_scrape_links(url)
 
+##used fro testing
 #web_scrape_links('https://arxiv.org/html/2410.15439v1')
 #add_topic(50, 'general economics')
 web_scrape_author()
 scrape_all_links_from_csv('medium_links.csv')
 
 #url rotation api
-# payload = { 'api_key': '25f0173438a83f6ec7ec454632f8c5c0', 'url': 'https://arxiv.org/' }
+# payload = { 'api_key': '', 'url': 'https://arxiv.org/' }
 # r = requests.get('https://arxiv.org/html/2410.18145v1', params=payload)
 #print(r.text)
